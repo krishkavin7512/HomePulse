@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>HomePulse · One meter, the whole house</title>
+  <meta name="description" content="A single smart-meter line, decoded into the devices hidden inside it with no labels and no extra sensors.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23101418'/%3E%3Cpath d='M3 18h7l3-10 5 17 3-7h8' fill='none' stroke='%23d7ff3e' stroke-width='3' stroke-linejoin='round' stroke-linecap='round'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/css/style.css">
+</head>
+<body class="is-loading">
+  <div class="loader" id="loader" aria-hidden="true">
+    <div class="loader__inner">
+      <div class="loader__read"><span id="loaderKw">0.000</span><small>kW</small></div>
+      <div class="loader__line"><i></i></div>
+      <div class="loader__meta"><span>One number</span><span>The whole house</span></div>
+    </div>
+  </div>
+  <div class="aurora" aria-hidden="true"><span></span><span></span></div>
+  <div class="gridlines" aria-hidden="true"></div>
+  <div class="grain" aria-hidden="true"></div>
+  <div class="progress" id="progress"></div>
+
+  <header class="nav" id="nav">
+    <a href="#hero" class="brand" aria-label="HomePulse home"><span class="brand__mark"></span>HomePulse</a>
+    <nav class="nav__links" id="navLinks" aria-label="Sections">
+      <span class="nav__pill"></span>
+      <a href="#decoder">Decoder</a><a href="#found">Discovery</a><a href="#bill">Bill</a><a href="#privacy">Privacy</a><a href="#rivals">Rivals</a><a href="#limits">Limits</a><a href="#inside">Inside</a>
+    </nav>
+    <div class="nav__cta"><a class="btn btn--sm" href="/graphs">Graphs</a></div>
+  </header>
+
+  <main>
+    <section class="hero" id="hero">
+      <canvas id="heroCanvas" aria-hidden="true"></canvas>
+      <div class="wrap hero__body">
+        <span class="eyebrow" data-reveal>Hidden Markov models on a real smart meter</span>
+        <h1 class="hero__title" id="heroTitle">Your meter sends one number. This decodes the <em>whole house.</em></h1>
+        <p class="lead hero__lead" data-reveal style="--d:300">No labels. No extra sensors. Nobody tells it what appliances exist. It watches one line of power and works out what must be hidden inside it. Then we open the answer key.</p>
+        <div class="hero__actions" data-reveal style="--d:450">
+          <a class="btn btn--primary" href="#decoder" data-magnetic>Decode a real day <span class="arrow">→</span></a>
+          <a class="btn" href="#rivals" data-magnetic>See who beats it</a>
+        </div>
+        <div class="hero__stats" id="heroStats" data-reveal style="--d:600"></div>
+      </div>
+      <div class="scroll-cue" aria-hidden="true"><span>Scroll</span><i></i></div>
+    </section>
+
+    <div class="marquee" aria-hidden="true"><div class="marquee__track" id="marquee"></div></div>
+
+    <section id="decoder">
+      <div class="wrap">
+        <div class="section-head">
+          <div><span class="eyebrow" data-reveal>01 · The decoder</span>
+            <h2 class="h2" data-reveal>One line goes in. <em>A household comes out.</em></h2></div>
+          <p class="lead" data-reveal style="--d:150">These days are from after the training cut-off, so the model has never seen them. The white line is all it gets. Press decode and watch the two passes of the algorithm run.</p>
+        </div>
+        <div class="dec-pick" data-reveal>
+          <div class="chips" id="presetChips" role="group" aria-label="Choose a day"></div>
+          <button class="chip-btn" id="randomDay" type="button">Random day ↻</button>
+          <label class="dec-date"><span class="sr-only">Pick any unseen day</span><input type="date" id="dayInput"></label>
+        </div>
+        <div class="card dec" data-reveal="scale">
+          <div class="dec__head">
+            <div><div class="tag" id="decDate">Loading…</div><div class="dec__status" id="decStatus" role="status" aria-live="polite">Model input: one line.</div></div>
+            <div class="dec__read"><div><b id="decClock">--:--</b><span>time</span></div><div><b id="decKw">–</b><span>kW total</span></div><div><b id="decKwh">–</b><span>kWh today</span></div></div>
+          </div>
+          <div class="dec__actions">
+            <button class="btn btn--primary" id="btnDecode" type="button" data-magnetic>Decode this day</button>
+            <button class="btn" id="btnPlay" type="button" disabled>▶ Play the day</button>
+            <button class="btn" id="btnKey" type="button" disabled>Open the answer key</button>
+            <span class="dec__note" id="decNote"></span>
+          </div>
+          <div class="dec__plot"><canvas id="decCanvas" role="img" aria-label="Total power for the chosen day, with decoded device layers once decoded"></canvas><div class="dec__tip" id="decTip" hidden></div></div>
+          <div class="devs" id="devs"></div>
+          <div class="verdict" id="verdict" hidden></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="found">
+      <div class="wrap">
+        <span class="eyebrow" data-reveal>02 · The discovery</span>
+        <h2 class="h2" data-reveal>It was never told. <em>It found the number anyway.</em></h2>
+        <div class="match" data-reveal="scale">
+          <div class="match__side"><div class="tag">Learned from the total alone</div><div class="match__v" id="mLearned">–</div><div class="match__l">kW, from a chain that was given no labels</div></div>
+          <div class="match__vs" aria-hidden="true">≈</div>
+          <div class="match__side"><div class="tag">Real sub-meter, opened afterwards</div><div class="match__v match__v--true" id="mTrue">–</div><div class="match__l">kW, most common on-power of the water heater + AC meter</div></div>
+        </div>
+        <div class="two">
+          <div data-reveal><h3 class="h3">What the model actually assumes</h3>
+            <p class="body" id="foundText"></p>
+            <pre class="eq" aria-label="Model equation">total(t) = base + Σ wattage<sub>m</sub> · on<sub>m</sub>(t) + noise</pre>
+            <p class="body" id="foundText2"></p></div>
+          <div class="card" data-reveal style="--d:120"><div class="tag">Different starting guesses</div><div class="plot" id="plotRestarts" style="height:340px"></div><p class="fine" id="restartNote"></p></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="bill">
+      <div class="wrap">
+        <div class="section-head">
+          <div><span class="eyebrow" data-reveal>03 · What's eating the bill</span>
+            <h2 class="h2" data-reveal>A breakdown your bill <em>has never shown you.</em></h2></div>
+          <p class="lead" data-reveal style="--d:150" id="billLead"></p>
+        </div>
+        <div class="two two--bill">
+          <div class="card" data-reveal>
+            <div class="bill__ctl">
+              <label class="ctl"><span>Your tariff <b id="tariffV"></b></span><input type="range" id="tariff" min="3" max="15" step="0.5"></label>
+              <label class="ctl"><span>Run <b id="cutName"></b> less <b id="cutV"></b></span><input type="range" id="cut" min="0" max="50" step="5" value="20"></label>
+            </div>
+            <div class="bars" id="billBars"></div>
+            <div class="save"><span>Saves about</span><b id="saveV">–</b><span>a month</span></div>
+            <p class="fine" id="billNote"></p>
+          </div>
+          <div class="card" data-reveal style="--d:120"><div class="tag">Heater energy per day, guess against truth</div><div class="plot" id="plotMonthly" style="height:420px"></div><p class="fine" id="monthlyNote"></p></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="privacy">
+      <div class="wrap">
+        <span class="eyebrow" data-reveal>04 · The uncomfortable part</span>
+        <h2 class="h2" data-reveal>If it can see the heater, <em>what else can it see?</em></h2>
+        <p class="lead" data-reveal id="privLead"></p>
+        <div class="two two--even">
+          <div class="card" data-reveal><div class="tag">From the meter alone</div><div class="plot" id="plotWeekDec" style="height:320px"></div></div>
+          <div class="card" data-reveal style="--d:120"><div class="tag">From the real kitchen and laundry meters</div><div class="plot" id="plotWeekTrue" style="height:320px"></div></div>
+        </div>
+        <div class="facts" id="privFacts"></div>
+      </div>
+    </section>
+
+    <section id="rivals">
+      <div class="wrap">
+        <div class="section-head">
+          <div><span class="eyebrow" data-reveal>05 · Who wins</span>
+            <h2 class="h2" data-reveal>Labels beat it. <em>Here is the price.</em></h2></div>
+          <p class="lead" data-reveal style="--d:150" id="rivalLead"></p>
+        </div>
+        <div class="card" data-reveal><div class="table-wrap"><table class="data" id="rivalTable"></table></div><p class="fine" id="rivalNote"></p></div>
+        <div class="two two--even" style="margin-top:18px">
+          <div class="card" data-reveal><div class="tag">How many labelled days until a tree wins?</div><div class="plot" id="plotBudget" style="height:330px"></div></div>
+          <div class="card" data-reveal style="--d:120"><div class="tag">Phantom switching</div><div class="plot" id="plotFlips" style="height:330px"></div><p class="fine" id="flipNote"></p></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="limits">
+      <div class="wrap">
+        <span class="eyebrow" data-reveal>06 · What did not work</span>
+        <h2 class="h2" data-reveal>Tested, and <em>reported anyway.</em></h2>
+        <div class="limits" id="limitsList"></div>
+      </div>
+    </section>
+
+    <section id="inside">
+      <div class="wrap">
+        <span class="eyebrow" data-reveal>07 · Inside</span>
+        <h2 class="h2" data-reveal>Every model, <em>written from scratch.</em></h2>
+        <p class="lead" data-reveal>All of it is NumPy with no modelling library behind it. scikit-learn appears only in the test suite, as a check on CART and AdaBoost.</p>
+        <div class="grid-inside" id="insideGrid"></div>
+      </div>
+    </section>
+  </main>
+
+  <footer id="footer">
+    <div class="wrap">
+      <a class="mega-link" href="/graphs" data-reveal data-cursor="open">
+        <div class="mega-link__row">
+          <div class="mega-link__txt"><span class="roll"><span><b id="nGraphs">All</b> graphs,</span><span><b id="nGraphs2">All</b> graphs,</span></span><br><span class="roll"><span>each one explained.</span><span>each one explained.</span></span></div>
+          <div class="mega-link__arrow"><svg width="40%" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="#eef2f5" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        </div>
+      </a>
+      <div class="foot"><div>Data: <a href="https://archive.ics.uci.edu/dataset/235/individual+household+electric+power+consumption" target="_blank" rel="noopener">Hebrail &amp; Berard, UCI #235</a>. One house in France, 2006 to 2010.</div><div>Built from scratch with NumPy · FastAPI · Plotly · <a href="/docs" target="_blank" rel="noopener">API docs</a></div></div>
+    </div>
+  </footer>
+
+  <script src="/assets/vendor/plotly.min.js"></script>
+  <script type="module" src="/assets/js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,9 @@
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
+venv/
+deliverables/
+artifacts/train.log
+.DS_Store
+Thumbs.db
