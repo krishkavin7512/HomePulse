@@ -215,6 +215,7 @@ Trained results are included, so it starts straight away. Useful extras:
 
 ```bash
 python run.py --retrain       # retrain everything, about 5 minutes
+pip install -r requirements-dev.txt   # test tools: pytest, scikit-learn
 python -m pytest tests -q     # 35 tests
 ```
 
