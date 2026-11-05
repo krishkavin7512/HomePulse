@@ -16,6 +16,7 @@ No labels. No extra sensors. Hidden Markov models written from scratch in NumPy 
 
 <img src="docs/screenshots/hero.jpg" alt="HomePulse landing page" width="92%">
 
+**Live demo:** [https://homepulse-umber.vercel.app](https://homepulse-umber.vercel.app)<br>
 [The idea](#idea) · [The discovery](#discovery) · [How it works](#how) · [Models](#models) · [Who wins](#results) · [What failed](#failed) · [Screenshots](#screenshots) · [Run it](#run)
 
 </div>
