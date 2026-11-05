@@ -1,0 +1,7 @@
+﻿tests/
+docs/
+deliverables/
+artifacts/train.log
+.venv/
+__pycache__/
+.pytest_cache/
