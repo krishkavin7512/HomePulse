@@ -1,0 +1,8 @@
+numpy>=2.0
+pandas>=2.2
+fastapi>=0.110
+uvicorn>=0.29
+# only used by the test suite, to check the from-scratch models
+scikit-learn>=1.5
+pytest>=8.0
+httpx>=0.27

@@ -1,0 +1,1 @@
+{"functions":{"api/index.py":{"includeFiles":"frontend/**,artifacts/**,data/days.npz"}},"rewrites":[{"source":"/(.*)","destination":"/api/index"}]}
